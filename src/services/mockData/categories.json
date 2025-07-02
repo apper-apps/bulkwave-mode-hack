@@ -1,0 +1,32 @@
+[
+  {
+    "Id": 1,
+    "name": "Team Groups",
+    "color": "#25D366",
+    "recipientIds": [2, 6, 11]
+  },
+  {
+    "Id": 2,
+    "name": "Client Communications",
+    "color": "#3B82F6",
+    "recipientIds": [3, 8, 4, 10]
+  },
+  {
+    "Id": 3,
+    "name": "Tech Communities",
+    "color": "#8B5CF6",
+    "recipientIds": [5, 9, 12]
+  },
+  {
+    "Id": 4,
+    "name": "Personal Contacts",
+    "color": "#F59E0B",
+    "recipientIds": [1, 4, 7, 10, 13]
+  },
+  {
+    "Id": 5,
+    "name": "Project Teams",
+    "color": "#EF4444",
+    "recipientIds": [14, 2, 6]
+  }
+]

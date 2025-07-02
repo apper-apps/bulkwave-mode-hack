@@ -1,0 +1,55 @@
+[
+  {
+    "Id": 1,
+    "messageId": "msg-2024011501",
+    "recipientIds": [1, 2, 3, 4, 5],
+    "speed": "medium",
+    "banProtection": "timestamp",
+    "status": "completed",
+    "progress": 100,
+    "startedAt": "2024-01-15T09:00:00Z",
+    "completedAt": "2024-01-15T09:05:30Z"
+  },
+  {
+    "Id": 2,
+    "messageId": "msg-2024011402",
+    "recipientIds": [6, 7, 8, 9],
+    "speed": "high",
+    "banProtection": "random",
+    "status": "completed",
+    "progress": 100,
+    "startedAt": "2024-01-14T14:30:00Z",
+    "completedAt": "2024-01-14T14:32:15Z"
+  },
+  {
+    "Id": 3,
+    "messageId": "msg-2024011303",
+    "recipientIds": [10, 11, 12],
+    "speed": "low",
+    "banProtection": "none",
+    "status": "sending",
+    "progress": 67,
+    "startedAt": "2024-01-13T16:15:00Z"
+  },
+  {
+    "Id": 4,
+    "messageId": "msg-2024011204",
+    "recipientIds": [13, 14, 15, 1, 2, 3, 4, 5],
+    "speed": "medium",
+    "banProtection": "timestamp",
+    "status": "paused",
+    "progress": 25,
+    "startedAt": "2024-01-12T11:20:00Z"
+  },
+  {
+    "Id": 5,
+    "messageId": "msg-2024011105",
+    "recipientIds": [6, 7, 8, 9, 10, 11],
+    "speed": "high",
+    "banProtection": "random",
+    "status": "completed",
+    "progress": 100,
+    "startedAt": "2024-01-11T13:45:00Z",
+    "completedAt": "2024-01-11T13:52:30Z"
+  }
+]

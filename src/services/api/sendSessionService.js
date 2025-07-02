@@ -14,13 +14,19 @@ class SendSessionService {
     }
   }
 
-async getAll() {
+async getAll(retryCount = 0) {
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1 second
+    
     if (!this.apperClient) {
       this.initializeClient();
       if (!this.apperClient) {
         console.error('SendSessionService.getAll: ApperClient initialization failed');
-        throw new Error('Failed to initialize API client');
+        throw new Error('Failed to initialize API client - SDK not available');
       }
+      
+      // Add delay after initialization to ensure SDK is fully loaded
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
     const params = {
@@ -40,18 +46,47 @@ async getAll() {
     };
 
     try {
-      const response = await this.apperClient.fetchRecords('send_session', params);
+      // Add timeout wrapper for the API call
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('API call timeout after 30 seconds')), 30000);
+      });
+      
+      const apiPromise = this.apperClient.fetchRecords('send_session', params);
+      const response = await Promise.race([apiPromise, timeoutPromise]);
 
-      // Handle null/undefined response
+      // Handle null/undefined response with retry logic
       if (!response) {
-        console.error('SendSessionService.getAll: Received null or undefined response from API');
-        throw new Error('Failed to fetch send sessions - no response from server');
+        const errorMsg = `SendSessionService.getAll: Received null or undefined response from API (attempt ${retryCount + 1}/${maxRetries + 1})`;
+        console.error(errorMsg);
+        
+        if (retryCount < maxRetries) {
+          const delay = baseDelay * Math.pow(2, retryCount); // Exponential backoff
+          console.log(`SendSessionService.getAll: Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return this.getAll(retryCount + 1);
+        }
+        
+        throw new Error('Failed to fetch send sessions - no response from server after multiple attempts');
       }
 
       // Handle failed response
       if (!response.success) {
         const errorMessage = response.message || 'Operation failed';
         console.error(`SendSessionService.getAll: API returned error - ${errorMessage}`);
+        
+        // Don't retry for authentication or validation errors
+        if (errorMessage.includes('unauthorized') || errorMessage.includes('forbidden') || errorMessage.includes('invalid')) {
+          throw new Error(errorMessage);
+        }
+        
+        // Retry for other server errors
+        if (retryCount < maxRetries) {
+          const delay = baseDelay * Math.pow(2, retryCount);
+          console.log(`SendSessionService.getAll: Retrying after API error in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return this.getAll(retryCount + 1);
+        }
+        
         throw new Error(errorMessage);
       }
 
@@ -61,15 +96,37 @@ async getAll() {
         return [];
       }
 
+      console.log(`SendSessionService.getAll: Successfully fetched ${response.data.length} send sessions`);
+      
       return response.data.map(session => ({
         ...session,
         recipient_ids: session.recipient_ids ? session.recipient_ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
       }));
     } catch (error) {
-      console.error('SendSessionService.getAll: Exception during API call:', error);
-      if (error.message.includes('Failed to fetch') || error.message.includes('no response from server')) {
-        throw error;
+      console.error(`SendSessionService.getAll: Exception during API call (attempt ${retryCount + 1}):`, {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      // Check if this is a network error that should be retried
+      const isNetworkError = error.message.includes('Failed to fetch') || 
+                            error.message.includes('network') || 
+                            error.message.includes('timeout') ||
+                            error.message.includes('no response from server');
+      
+      if (isNetworkError && retryCount < maxRetries) {
+        const delay = baseDelay * Math.pow(2, retryCount);
+        console.log(`SendSessionService.getAll: Retrying network error in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.getAll(retryCount + 1);
       }
+      
+      // Re-throw with enhanced error message
+      if (error.message.includes('Failed to fetch') || error.message.includes('no response from server')) {
+        throw new Error(`Network error: Unable to connect to server. Please check your internet connection and try again.`);
+      }
+      
       throw new Error(`Failed to fetch send sessions: ${error.message}`);
     }
   }

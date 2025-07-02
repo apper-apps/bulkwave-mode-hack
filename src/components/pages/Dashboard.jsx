@@ -9,7 +9,7 @@ import Loading from '@/components/ui/Loading';
 import Error from '@/components/ui/Error';
 import { recipientService } from '@/services/api/recipientService';
 import { sendSessionService } from '@/services/api/sendSessionService';
-
+import { toast } from 'react-toastify';
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalRecipients: 0,
@@ -25,17 +25,40 @@ const Dashboard = () => {
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
+const loadDashboardData = async () => {
     try {
       setLoading(true);
       setError('');
       
-      const [recipients, sessions] = await Promise.all([
-        recipientService.getAll(),
-        sendSessionService.getAll()
-      ]);
+      let recipients = [];
+      let sessions = [];
+      let hasErrors = false;
+      
+      // Load recipients with individual error handling
+      try {
+        recipients = await recipientService.getAll();
+        console.log('Dashboard: Successfully loaded recipients', recipients.length);
+      } catch (recipientError) {
+        console.error('Dashboard: Failed to load recipients:', recipientError);
+        toast.error('Failed to load recipient data');
+        hasErrors = true;
+      }
+      
+      // Load send sessions with individual error handling
+      try {
+        sessions = await sendSessionService.getAll();
+        console.log('Dashboard: Successfully loaded send sessions', sessions.length);
+      } catch (sessionError) {
+        console.error('Dashboard: SendSessionService error details:', {
+          message: sessionError.message,
+          stack: sessionError.stack,
+          name: sessionError.name
+        });
+        toast.error('Failed to load send session data - please check your connection');
+        hasErrors = true;
+      }
 
-      // Calculate stats
+      // Calculate stats with available data
       const newStats = {
         totalRecipients: recipients.length,
         totalContacts: recipients.filter(r => r.type === 'contact').length,
@@ -44,9 +67,16 @@ const Dashboard = () => {
       };
       
       setStats(newStats);
-setRecentSessions(sessions.slice(0, 5));
+      setRecentSessions(sessions.slice(0, 5));
+      
+      // Set appropriate error state
+      if (hasErrors) {
+        setError('Some data could not be loaded. Please refresh to try again.');
+      }
     } catch (err) {
+      console.error('Dashboard: Unexpected error during data loading:', err);
       setError('Failed to load dashboard data');
+      toast.error('An unexpected error occurred while loading dashboard data');
     } finally {
       setLoading(false);
     }

@@ -44,7 +44,7 @@ const Dashboard = () => {
       };
       
       setStats(newStats);
-      setRecentSessions(sessions.slice(0, 5));
+setRecentSessions(sessions.slice(0, 5));
     } catch (err) {
       setError('Failed to load dashboard data');
     } finally {
@@ -194,11 +194,11 @@ const Dashboard = () => {
                       <ApperIcon name="Send" className="w-5 h-5 text-whatsapp-600" />
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">
-                        {session.recipientIds.length} recipients
+<div className="font-medium text-gray-900">
+                        {session.recipient_ids.length} recipients
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(session.startedAt).toLocaleDateString()}
+<div className="text-sm text-gray-500">
+                        {new Date(session.started_at).toLocaleDateString()}
                       </div>
                     </div>
                   </div>

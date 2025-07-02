@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import ApperIcon from '@/components/ApperIcon';
-import Button from '@/components/atoms/Button';
-import Badge from '@/components/atoms/Badge';
-import StatusPill from '@/components/molecules/StatusPill';
-import SearchBar from '@/components/molecules/SearchBar';
-import Loading from '@/components/ui/Loading';
-import Error from '@/components/ui/Error';
-import Empty from '@/components/ui/Empty';
-import { sendSessionService } from '@/services/api/sendSessionService';
-import { recipientService } from '@/services/api/recipientService';
-import { format } from 'date-fns';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import StatusPill from "@/components/molecules/StatusPill";
+import SearchBar from "@/components/molecules/SearchBar";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import Recipients from "@/components/pages/Recipients";
+import Settings from "@/components/pages/Settings";
+import { sendSessionService } from "@/services/api/sendSessionService";
+import { recipientService } from "@/services/api/recipientService";
 
 const History = () => {
   const [sessions, setSessions] = useState([]);
@@ -24,22 +26,23 @@ const History = () => {
     loadSessions();
   }, []);
 
-  const loadSessions = async () => {
+const loadSessions = async () => {
     try {
       setLoading(true);
       setError('');
       const data = await sendSessionService.getAll();
       // Sort by most recent first
-      setSessions(data.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)));
+      setSessions(data.sort((a, b) => new Date(b.started_at) - new Date(a.started_at)));
     } catch (err) {
+      console.error('Failed to load sessions:', err);
       setError('Failed to load send history');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredSessions = sessions.filter(session => {
-    const matchesSearch = session.messageId.toLowerCase().includes(searchTerm.toLowerCase());
+const filteredSessions = sessions.filter(session => {
+    const matchesSearch = session?.message_id?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
     const matchesStatus = filterStatus === 'all' || session.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -70,10 +73,11 @@ const History = () => {
       case 'timestamp': return 'Date & Time';
       default: return protection;
     }
+}
   };
 
   const calculateDuration = (startedAt, completedAt) => {
-    if (!completedAt) return 'In Progress';
+    if (!startedAt || !completedAt) return 'N/A';
     
     const start = new Date(startedAt);
     const end = new Date(completedAt);
@@ -170,8 +174,8 @@ const History = () => {
               <ApperIcon name="Users" className="w-6 h-6 text-gray-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {sessions.reduce((total, session) => total + session.recipientIds.length, 0)}
+<div className="text-2xl font-bold text-gray-900">
+                {sessions.reduce((total, session) => total + (session.recipient_ids?.length || 0), 0)}
               </div>
               <div className="text-sm text-gray-500">Total Messages</div>
             </div>
@@ -236,15 +240,15 @@ const History = () => {
                     transition={{ delay: index * 0.05 }}
                     className="border-b border-gray-100 hover:bg-gray-50"
                   >
-                    <td className="py-4 px-6">
+<td className="py-4 px-6">
                       <div>
-                        <div className="font-medium text-gray-900 text-sm">{session.messageId}</div>
+                        <div className="font-medium text-gray-900 text-sm">{session.message_id}</div>
                         <div className="text-xs text-gray-500">ID: {session.Id}</div>
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="text-center">
-                        <div className="text-lg font-bold text-gray-900">{session.recipientIds.length}</div>
+                        <div className="text-lg font-bold text-gray-900">{session.recipient_ids?.length || 0}</div>
                         <div className="text-xs text-gray-500">recipients</div>
                       </div>
                     </td>
@@ -272,18 +276,18 @@ const History = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-6">
+<td className="py-4 px-6">
                       <span className="text-sm text-gray-900">
-                        {calculateDuration(session.startedAt, session.completedAt)}
+                        {calculateDuration(session.started_at, session.completed_at)}
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <div>
+<div>
                         <div className="text-sm text-gray-900">
-                          {format(new Date(session.startedAt), 'MMM d, yyyy')}
+                          {format(new Date(session.started_at), 'MMM d, yyyy')}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {format(new Date(session.startedAt), 'h:mm a')}
+                          {format(new Date(session.started_at), 'h:mm a')}
                         </div>
                       </div>
                     </td>
@@ -327,9 +331,9 @@ const History = () => {
             
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-6">
-                <div>
+<div>
                   <label className="text-sm font-medium text-gray-500">Message ID</label>
-                  <div className="text-lg text-gray-900">{selectedSession.messageId}</div>
+                  <div className="text-lg text-gray-900">{selectedSession.message_id}</div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Status</label>
@@ -339,7 +343,7 @@ const History = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Recipients</label>
-                  <div className="text-lg text-gray-900">{selectedSession.recipientIds.length}</div>
+                  <div className="text-lg text-gray-900">{selectedSession.recipient_ids?.length || 0}</div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Progress</label>
@@ -353,16 +357,16 @@ const History = () => {
                   <label className="text-sm font-medium text-gray-500">Ban Protection</label>
                   <div className="text-lg text-gray-900">{getBanProtectionLabel(selectedSession.banProtection)}</div>
                 </div>
-                <div>
+<div>
                   <label className="text-sm font-medium text-gray-500">Started</label>
                   <div className="text-lg text-gray-900">
-                    {format(new Date(selectedSession.startedAt), 'MMM d, yyyy h:mm a')}
+                    {format(new Date(selectedSession.started_at), 'MMM d, yyyy h:mm a')}
                   </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Duration</label>
                   <div className="text-lg text-gray-900">
-                    {calculateDuration(selectedSession.startedAt, selectedSession.completedAt)}
+                    {calculateDuration(selectedSession.started_at, selectedSession.completed_at)}
                   </div>
                 </div>
               </div>

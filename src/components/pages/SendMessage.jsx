@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { toast } from 'react-toastify';
-import ApperIcon from '@/components/ApperIcon';
-import Button from '@/components/atoms/Button';
-import MessageComposer from '@/components/organisms/MessageComposer';
-import RecipientSelector from '@/components/organisms/RecipientSelector';
-import SendConfiguration from '@/components/organisms/SendConfiguration';
-import SendProgressModal from '@/components/organisms/SendProgressModal';
-import { sendSessionService } from '@/services/api/sendSessionService';
-import { recipientService } from '@/services/api/recipientService';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import SendConfiguration from "@/components/organisms/SendConfiguration";
+import RecipientSelector from "@/components/organisms/RecipientSelector";
+import MessageComposer from "@/components/organisms/MessageComposer";
+import SendProgressModal from "@/components/organisms/SendProgressModal";
+import Button from "@/components/atoms/Button";
+import Recipients from "@/components/pages/Recipients";
+import { sendSessionService } from "@/services/api/sendSessionService";
+import { recipientService } from "@/services/api/recipientService";
 
 const SendMessage = () => {
   const [message, setMessage] = useState({
@@ -57,14 +58,14 @@ const SendMessage = () => {
       setSending(true);
       
       // Create send session
-      const sessionData = {
-        messageId: `msg-${Date.now()}`,
-        recipientIds: selectedRecipients,
+const sessionData = {
+        message_id: `msg-${Date.now()}`,
+        recipient_ids: selectedRecipients,
         speed: config.speed,
-        banProtection: config.banProtection,
+        ban_protection: config.banProtection,
         status: 'pending',
         progress: 0,
-        startedAt: new Date().toISOString()
+        started_at: new Date().toISOString()
       };
 
       const session = await sendSessionService.create(sessionData);
@@ -89,9 +90,8 @@ const SendMessage = () => {
       high: 15000
     };
     
-    const delay = delayMap[session.speed];
-    const totalRecipients = session.recipientIds.length;
-    
+const delay = delayMap[session.speed];
+    const totalRecipients = session.recipient_ids.length;
     // Update session to sending
     const updatedSession = await sendSessionService.update(session.Id, {
       status: 'sending'
@@ -101,12 +101,11 @@ const SendMessage = () => {
     // Simulate progress
     for (let i = 1; i <= totalRecipients; i++) {
       await new Promise(resolve => setTimeout(resolve, delay));
-      
-      const progress = (i / totalRecipients) * 100;
+const progress = (i / totalRecipients) * 100;
       const progressSession = await sendSessionService.update(session.Id, {
         progress: Math.round(progress),
         status: i === totalRecipients ? 'completed' : 'sending',
-        completedAt: i === totalRecipients ? new Date().toISOString() : undefined
+        completed_at: i === totalRecipients ? new Date().toISOString() : undefined
       });
       
       setCurrentSession(progressSession);

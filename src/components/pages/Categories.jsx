@@ -116,7 +116,7 @@ const Categories = () => {
     }
   };
 
-  const getCategoryRecipients = (recipientIds) => {
+const getCategoryRecipients = (recipientIds) => {
     return recipients.filter(r => recipientIds.includes(r.Id));
   };
 
@@ -204,8 +204,8 @@ const Categories = () => {
                       <ApperIcon 
                         name={recipient.type === 'group' ? 'Users' : recipient.type === 'community' ? 'Building' : 'User'} 
                         className="w-4 h-4 text-gray-500" 
-                      />
-                      <span className="text-sm text-gray-900">{recipient.name}</span>
+/>
+                      <span className="text-sm text-gray-900">{recipient.Name}</span>
                       <Badge variant="default" size="sm">{recipient.type}</Badge>
                     </div>
                   </label>
@@ -281,8 +281,8 @@ const Categories = () => {
                             checked={editingCategory.recipientIds.includes(recipient.Id)}
                             onChange={() => toggleRecipientInCategory(recipient.Id, editingCategory)}
                             className="rounded text-whatsapp-500 focus:ring-whatsapp-500"
-                          />
-                          <span>{recipient.name}</span>
+/>
+                          <span>{recipient.Name}</span>
                         </label>
                       ))}
                     </div>
@@ -303,10 +303,10 @@ const Categories = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div
-                        className="w-4 h-4 rounded-full"
+className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: category.color }}
                       />
-                      <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                      <h3 className="font-semibold text-gray-900">{category.Name}</h3>
                     </div>
                     
                     <div className="flex space-x-1">
@@ -324,27 +324,26 @@ const Categories = () => {
                       </button>
                     </div>
                   </div>
-
-                  <div className="mb-4">
+<div className="mb-4">
                     <div className="text-2xl font-bold text-gray-900 mb-1">
-                      {category.recipientIds.length}
+                      {category.recipient_ids.length}
                     </div>
                     <div className="text-sm text-gray-500">Recipients</div>
                   </div>
 
-                  <div className="space-y-2">
-                    {getCategoryRecipients(category.recipientIds).slice(0, 3).map((recipient) => (
+<div className="space-y-2">
+                    {getCategoryRecipients(category.recipient_ids).slice(0, 3).map((recipient) => (
                       <div key={recipient.Id} className="flex items-center space-x-2 text-sm">
                         <ApperIcon 
                           name={recipient.type === 'group' ? 'Users' : recipient.type === 'community' ? 'Building' : 'User'} 
                           className="w-4 h-4 text-gray-500" 
                         />
-                        <span className="text-gray-900 truncate">{recipient.name}</span>
+                        <span className="text-gray-900 truncate">{recipient.Name}</span>
                       </div>
                     ))}
-                    {category.recipientIds.length > 3 && (
+{category.recipient_ids.length > 3 && (
                       <div className="text-xs text-gray-500">
-                        +{category.recipientIds.length - 3} more
+                        +{category.recipient_ids.length - 3} more
                       </div>
                     )}
                   </div>

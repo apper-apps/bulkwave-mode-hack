@@ -37,21 +37,21 @@ const Recipients = () => {
 
   const filteredAndSortedRecipients = recipients
     .filter(recipient => {
-      const matchesSearch = recipient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (recipient.phoneNumber && recipient.phoneNumber.includes(searchTerm));
+const matchesSearch = recipient.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (recipient.phone_number && recipient.phone_number.includes(searchTerm));
       const matchesType = filterType === 'all' || recipient.type === filterType;
       return matchesSearch && matchesType;
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
+case 'name':
+          return a.Name.localeCompare(b.Name);
         case 'type':
           return a.type.localeCompare(b.type);
-        case 'members':
-          return (b.memberCount || 0) - (a.memberCount || 0);
+case 'members':
+          return (b.member_count || 0) - (a.member_count || 0);
         case 'recent':
-          return new Date(b.lastMessageTime || 0) - new Date(a.lastMessageTime || 0);
+          return new Date(b.last_message_time || 0) - new Date(a.last_message_time || 0);
         default:
           return 0;
       }
@@ -244,8 +244,8 @@ const Recipients = () => {
                             className="w-5 h-5 text-whatsapp-600" 
                           />
                         </div>
-                        <div>
-                          <div className="font-medium text-gray-900">{recipient.name}</div>
+<div>
+                          <div className="font-medium text-gray-900">{recipient.Name}</div>
                         </div>
                       </div>
                     </td>
@@ -254,24 +254,24 @@ const Recipients = () => {
                         {recipient.type}
                       </Badge>
                     </td>
-                    <td className="py-4 px-6">
-                      {recipient.memberCount ? (
-                        <span className="text-gray-900">{recipient.memberCount.toLocaleString()}</span>
+<td className="py-4 px-6">
+                      {recipient.member_count ? (
+                        <span className="text-gray-900">{recipient.member_count.toLocaleString()}</span>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="py-4 px-6">
-                      {recipient.phoneNumber ? (
-                        <span className="text-gray-900">{recipient.phoneNumber}</span>
+<td className="py-4 px-6">
+                      {recipient.phone_number ? (
+                        <span className="text-gray-900">{recipient.phone_number}</span>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="py-4 px-6">
-                      {recipient.lastMessageTime ? (
+<td className="py-4 px-6">
+                      {recipient.last_message_time ? (
                         <span className="text-gray-900">
-                          {format(new Date(recipient.lastMessageTime), 'MMM d, yyyy')}
+                          {format(new Date(recipient.last_message_time), 'MMM d, yyyy')}
                         </span>
                       ) : (
                         <span className="text-gray-400">Never</span>

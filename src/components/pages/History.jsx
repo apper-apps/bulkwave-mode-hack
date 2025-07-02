@@ -66,14 +66,13 @@ const filteredSessions = sessions.filter(session => {
     }
   };
 
-  const getBanProtectionLabel = (protection) => {
+const getBanProtectionLabel = (protection) => {
     switch (protection) {
       case 'none': return 'None';
       case 'random': return 'Random String';
       case 'timestamp': return 'Date & Time';
       default: return protection;
     }
-}
   };
 
   const calculateDuration = (startedAt, completedAt) => {

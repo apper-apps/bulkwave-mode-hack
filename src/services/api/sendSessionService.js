@@ -35,9 +35,9 @@ class SendSessionService {
 
     const response = await this.apperClient.fetchRecords('send_session', params);
 
-    if (!response.success) {
-      console.error(response.message);
-      throw new Error(response.message);
+if (!response.success) {
+      console.error(response.message || 'Operation failed');
+      throw new Error(response.message || 'Operation failed');
     }
 
     return response.data?.map(session => ({
@@ -67,9 +67,9 @@ class SendSessionService {
 
     const response = await this.apperClient.getRecordById('send_session', parseInt(id), params);
 
-    if (!response.success) {
-      console.error(response.message);
-      throw new Error(response.message);
+if (!response.success) {
+      console.error(response.message || 'Operation failed');
+      throw new Error(response.message || 'Operation failed');
     }
 
     const session = response.data;
@@ -101,9 +101,9 @@ class SendSessionService {
 
     const response = await this.apperClient.createRecord('send_session', params);
 
-    if (!response.success) {
-      console.error(response.message);
-      throw new Error(response.message);
+if (!response.success) {
+      console.error(response.message || 'Operation failed');
+      throw new Error(response.message || 'Operation failed');
     }
 
     if (response.results) {
@@ -151,9 +151,9 @@ class SendSessionService {
 
     const response = await this.apperClient.updateRecord('send_session', params);
 
-    if (!response.success) {
-      console.error(response.message);
-      throw new Error(response.message);
+if (!response.success) {
+      console.error(response.message || 'Operation failed');
+      throw new Error(response.message || 'Operation failed');
     }
 
     if (response.results) {
@@ -182,9 +182,9 @@ class SendSessionService {
 
     const response = await this.apperClient.deleteRecord('send_session', params);
 
-    if (!response.success) {
-      console.error(response.message);
-      throw new Error(response.message);
+if (!response.success) {
+      console.error(response.message || 'Operation failed');
+      throw new Error(response.message || 'Operation failed');
     }
 
     return true;

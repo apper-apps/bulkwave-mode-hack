@@ -4,9 +4,10 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  theme: {
+theme: {
     extend: {
       colors: {
+        border: '#e5e7eb', // Default border color for border-border utility
         whatsapp: {
           50: '#e8f5e8',
           100: '#c3e6c3',

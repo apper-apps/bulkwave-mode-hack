@@ -33,17 +33,31 @@ class SendSessionService {
       ]
     };
 
-    const response = await this.apperClient.fetchRecords('send_session', params);
+const response = await this.apperClient.fetchRecords('send_session', params);
 
-if (!response.success) {
-      console.error(response.message || 'Operation failed');
-      throw new Error(response.message || 'Operation failed');
+    // Handle null/undefined response
+    if (!response) {
+      console.error('SendSessionService.getAll: Received null or undefined response from API');
+      throw new Error('Failed to fetch send sessions - no response from server');
     }
 
-    return response.data?.map(session => ({
+    // Handle failed response
+    if (!response.success) {
+      const errorMessage = response.message || 'Operation failed';
+      console.error(`SendSessionService.getAll: API returned error - ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+
+    // Handle missing or invalid data
+    if (!response.data) {
+      console.warn('SendSessionService.getAll: Response success but no data field present');
+      return [];
+    }
+
+    return response.data.map(session => ({
       ...session,
       recipient_ids: session.recipient_ids ? session.recipient_ids.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id)) : []
-    })) || [];
+    }));
   }
 
   async getById(id) {
@@ -65,11 +79,25 @@ if (!response.success) {
       ]
     };
 
-    const response = await this.apperClient.getRecordById('send_session', parseInt(id), params);
+const response = await this.apperClient.getRecordById('send_session', parseInt(id), params);
 
-if (!response.success) {
-      console.error(response.message || 'Operation failed');
-      throw new Error(response.message || 'Operation failed');
+    // Handle null/undefined response
+    if (!response) {
+      console.error(`SendSessionService.getById: Received null or undefined response from API for ID ${id}`);
+      throw new Error(`Failed to fetch send session ${id} - no response from server`);
+    }
+
+    // Handle failed response
+    if (!response.success) {
+      const errorMessage = response.message || 'Operation failed';
+      console.error(`SendSessionService.getById: API returned error for ID ${id} - ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+
+    // Handle missing data
+    if (!response.data) {
+      console.error(`SendSessionService.getById: Response success but no data field present for ID ${id}`);
+      throw new Error(`Send session ${id} not found`);
     }
 
     const session = response.data;
